@@ -29,4 +29,6 @@ load(model, options)
 # display some images with its reconstruction
 test_vae(model, dataset, options)
 generate_using_encoder(model, options)
+
 plot_latent(model, dataset, options)
+plot_latent_pca(model, dataset, options)

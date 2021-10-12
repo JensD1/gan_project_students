@@ -7,6 +7,7 @@ import torch.nn as nn
 from dataset import Dataset
 from models import VanillaAutoEncoder, VariationalAutoEncoder
 from options import Options
+from sklearn.decomposition import PCA
 
 
 def train_autoencoder(model: VanillaAutoEncoder, options: Options, dataset: Dataset,
@@ -139,6 +140,22 @@ def plot_latent(autoencoder: nn.Module, dataset: Dataset, options: Options, num_
         z = autoencoder.encode(x.to(options.device))
         z = z.to('cpu').detach().numpy()
         plt.scatter(z[:, 0], z[:, 1], c=y, cmap='tab10')
+        if i > num_batches:
+            plt.colorbar()
+            break
+    plt.show()
+
+def plot_latent_pca(autoencoder: nn.Module, dataset: Dataset, options: Options, num_batches: int = 100):
+    """
+    Plot the latent space to see how it differs between models.
+    """
+    pca = PCA(n_components=2)
+    for i, (x, y) in enumerate(dataset.test_loader):
+        z = autoencoder.encode(x.to(options.device))
+        z = z.to('cpu').detach().numpy()
+        pca.fit(z)
+        reduced_z = pca.transform(z)
+        plt.scatter(reduced_z[:, 0], reduced_z[:, 1], c=y, cmap='tab10')
         if i > num_batches:
             plt.colorbar()
             break
